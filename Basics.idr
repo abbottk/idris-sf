@@ -12,8 +12,11 @@ trivial = do compute
                                       TextPart "is not trivial"
                                      ]
 
-||| enumerated types
-||| days of the week
+|||
+||| Enumerated Types
+|||
+
+||| Days of the Week
 |||
 data Day : Type where
      Monday    : Day
@@ -34,6 +37,7 @@ next_weekday d = case d of
              Saturday  => Monday
              Sunday    => Monday
 
+||| next_weekeday assertions
 is_next_weekday1 : (d : Day) -> next_weekday Friday = Monday
 is_next_weekday1 d = Refl
 
@@ -65,6 +69,7 @@ orb b1 b2 = case b1 of
     Top => Top
     Bot => b2
 
+||| orb assertions
 test_orb1 : (orb Top Bot) = Top
 test_orb1 = Refl
 
@@ -77,9 +82,17 @@ test_orb3 = Refl
 test_orb4 : (orb Top Top) = Top
 test_orb4 = Refl
 
+
+||| Exercise: 1 star (nandb)
+||| Complete the definition of the following function, then make sure that the
+|||   assertions below can each be verified by Idris.
+|||
+||| This function should return true if either or both of its inputs are false.
+|||
 nandb : (b1,b2 : Boolean) -> Boolean
 nandb b1 b2 = (negb (andb b1 b2))
 
+||| nandb assertions
 test_nandb1 : (nandb Top Bot) = Top
 test_nandb1 = Refl
 
@@ -92,9 +105,15 @@ test_nandb3 = Refl
 test_nandb4 : (nandb Top Top) = Bot
 test_nandb4 = Refl
 
+
+||| Exercise: 1 star (andb3)
+||| Do the same for the andb3 function below. This function should return true
+|||   when all of its inpouts are true, and false otherwise.
+|||
 andb3 : (b1,b2,b3 : Boolean) -> Boolean
 andb3 b1 b2 b3 = (andb b1 (andb b2 b3))
 
+||| andb3 assertions
 test_andb31 : (andb3 Top Top Top) = Top
 test_andb31 = Refl
 
@@ -108,12 +127,16 @@ test_andb34 : (andb3 Top Top Bot) = Bot
 test_andb34 = Refl
 
 
+|||
+||| Function Types
+|||
+
 ||| Numbers
 |||
+
 ||| data Nats : Type where
 |||      O : Nats
 |||      S : Nats -> Nats
-|||
 pred : (n : Nat) -> Nat
 pred n = case n of
      Z   => Z
@@ -134,6 +157,7 @@ evenb n = case n of
 oddb : (n : Nat) -> Boolean
 oddb n = negb (evenb n)
 
+||| oddb assertions
 test_oddb1 : (oddb (S Z)) = Top
 test_oddb1 = Refl
 
@@ -161,14 +185,72 @@ exp base power = case power of
     Z   => S Z
     S p => mult' base (exp base p)
 
+
+||| Exercise: 1 star (factorial)
+||| Translate the standard factorial function into Idris.
+|||
 factorial : (n : Nat) -> Nat
 factorial n = case n of
           Z   => S Z
           S Z => S Z
           S k => (mult' n (factorial k))
 
+||| factorial assertions
 test_factorial1 : (factorial 3) = 6
 test_factorial1 = Refl
 
 test_factorial2 : (factorial 5) = (mult' 10 12)
 test_factorial2 = Refl
+
+beq_nat : (n,m : Nat) -> Boolean
+beq_nat n m = case n of
+        Z => case m of
+          Z   => Top
+          S j => Bot
+        S k => case m of
+          Z   => Bot
+          S j => beq_nat k j
+
+ble_nat : (n,m : Nat) -> Boolean
+ble_nat n m = case n of
+        Z   => Top
+        S k => case m of
+            Z   => Bot
+            S j => ble_nat k j
+
+||| ble_nat assertions
+test_ble_nat1 : (ble_nat 2 2) = Top
+test_ble_nat1 = Refl
+
+test_ble_nat2 : (ble_nat 2 4) = Top
+test_ble_nat2 = Refl
+
+test_ble_nat3 : (ble_nat 4 2) = Bot
+test_ble_nat3 = Refl
+
+
+||| Exercise: 2 stars (blt_nat)
+||| The blt_nat function test natural numbers for less-than, yielding a boolean.
+|||
+blt_nat : (n,m : Nat) -> Boolean
+blt_nat n m = case (beq_nat n m) of
+        Top => Bot
+        Bot => (ble_nat n m)
+
+||| blt_nat assertions
+test_blt_nat1 : (blt_nat 2 2) = Bot
+test_blt_nat1 = Refl
+
+test_blt_nat2 : (blt_nat 2 4) = Top
+test_blt_nat2 = Refl
+
+test_blt_nat3 : (blt_nat 4 2) = Bot
+test_blt_nat3 = Refl
+
+
+|||
+||| Proof by Simplification
+|||
+
+plus_Z_n : {n : Nat} -> 0 + n = n
+plus_Z_n = ?plus_Z_n
